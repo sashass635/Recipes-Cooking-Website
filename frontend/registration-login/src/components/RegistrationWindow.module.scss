@@ -1,0 +1,149 @@
+.pageWrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #d4d0d0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.registration {
+  background-color: #fff;
+  padding: 20px;
+  width: 600px;
+  border-radius: 10px;
+  box-shadow: #3f3e3e;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  position: relative;
+}
+
+.exitButtonContainer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.exitButton {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+}
+
+.registrationHeader {
+  text-align: left;
+  margin-bottom: 5%;
+}
+
+.registrationHeader h3 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.registrationFormContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.registrationForm {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.PasswordsContainer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.PasswordsBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+
+  input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 16px;
+    border: 1px solid #e2e2e2;
+  }
+
+  .passwordInput {
+    margin-right: 2%;
+  }
+
+  .confirmPasswordInput {
+    margin-left: 2%;
+  }
+  .passwordSubtext {
+    font-size: 12px;
+    color: #c4c4c4;
+    margin-top: 5px;
+  }
+}
+
+.LoginBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+.LoginBlock input {
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 16px;
+  border: 1px solid #e2e2e2;
+}
+
+.passwordSubtext {
+  font-size: 12px;
+  color: #c4c4c4;
+  margin-top: 5px;
+}
+
+.RegistrationButtons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.submitButton {
+  width: 250px;
+  border-radius: 16px;
+  background-color: #fdb100;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 30px;
+}
+
+.resetButton {
+  width: 250px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  color: #fdb100;
+  font-weight: 500;
+  font-size: 15px;
+  line-height: 30px;
+  border: solid 1px #fdb100;
+}
+
+.authLink {
+  color: #fdb100;
+  background-color: #ffffff;
+  font-size: 95%;
+  line-height: 30%;
+  font-weight: 500;
+  text-decoration: underline 1px dashed;
+  width: 100%;
+  text-align: center;
+}
