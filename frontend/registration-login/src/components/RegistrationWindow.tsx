@@ -9,11 +9,21 @@ export const RegistrationWindow = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const setNotification = useStore((state) => state.setNotification);
+  const setLoginWindowOpen = useStore((state) => state.setLoginWindowOpen);
+  const setRegistrationWindowOpen = useStore((state) => state.setRegistrationWindowOpen);
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
       return;
     }
+    axios
+      .post("https://localhost:7161/api/user/register", { name, login, password })
+      .then(() => {
+        setNotification("Registration successful");
+      })
+      .catch((error) => {
+        setNotification("Error during registration");
+      });
   };
 
   const handleCancel = () => {
@@ -24,11 +34,21 @@ export const RegistrationWindow = () => {
     setNotification("");
   };
 
+  const setAuthorization = () => {
+    setRegistrationWindowOpen(false);
+    setLoginWindowOpen(true);
+  };
+
   return (
     <div className={styles.pageWrapper}>
       <div className={styles.registration}>
         <span className={styles.exitButtonContainer}>
-          <button onClick={handleCancel} className={styles.exitButton}>
+          <button
+            onClick={() => {
+              setRegistrationWindowOpen(false);
+            }}
+            className={styles.exitButton}
+          >
             &times;
           </button>
         </span>
@@ -40,13 +60,20 @@ export const RegistrationWindow = () => {
             className={styles.registrationForm}
             onSubmit={(e) => {
               handleRegister();
+              e.preventDefault();
             }}
           >
             <span className={styles.LoginBlock}>
-              <input type="text" placeholder="Имя" value={name} onChange={(e) => setName(e.target.value)} />
+              <input type="text" placeholder="Имя" value={name} onChange={(e) => setName(e.target.value)} required />
             </span>
             <span className={styles.LoginBlock}>
-              <input type="text" placeholder="Логин" value={login} onChange={(e) => setLogin(e.target.value)} />
+              <input
+                type="text"
+                placeholder="Логин"
+                value={login}
+                onChange={(e) => setLogin(e.target.value)}
+                required
+              />
             </span>
             <span className={styles.PasswordsContainer}>
               <span className={styles.PasswordsBlock}>
@@ -57,6 +84,7 @@ export const RegistrationWindow = () => {
                   value={password}
                   minLength={8}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
                 <p className={styles.passwordSubtext}>Минимум 8 символов</p>
               </span>
@@ -67,6 +95,7 @@ export const RegistrationWindow = () => {
                   className={styles.confirmPasswordInput}
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  required
                 />
               </span>
             </span>
@@ -80,7 +109,7 @@ export const RegistrationWindow = () => {
             </span>
           </form>
         </span>
-        <button className={styles.authLink} disabled>
+        <button className={styles.authLink} onClick={setAuthorization}>
           У меня уже есть аккаунт
         </button>
       </div>

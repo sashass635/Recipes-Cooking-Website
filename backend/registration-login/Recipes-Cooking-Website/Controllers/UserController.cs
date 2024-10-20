@@ -1,6 +1,8 @@
 ﻿using Domain.Entities;
 using Domain.Repositories;
+using Infrastructure.SecurityServices.JWTTokens;
 using Infrastructure.SecurityServices.PasswordHasher;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Recipes_Cooking_Website.Contracts;
 
@@ -13,11 +15,13 @@ public class UserController : ControllerBase
 
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly JwtProvider _jwtTokenProvider;
 
-    public UserController( IUserRepository userRepository, IPasswordHasher passwordHasher )
+    public UserController( IUserRepository userRepository, IPasswordHasher passwordHasher, JwtProvider jwtTokenProvider )
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
+        _jwtTokenProvider = jwtTokenProvider;
     }
 
     [HttpPost( "register" )]
@@ -43,15 +47,26 @@ public class UserController : ControllerBase
     {
         var existingUser = _userRepository.GetUserByLogin( userDto.Login );
         var isPasswordValid = _passwordHasher.VerifyPassword( userDto.Password, existingUser.Password );
-
+        
         if ( existingUser == null || !isPasswordValid )
         {
             return Unauthorized( "Invalid login or password" );
         }
 
-        return Ok( "Login successful" );
+        var token = _jwtTokenProvider.GenerateToken( existingUser );
+
+        Response.Cookies.Append( "CookiesToken", token, new CookieOptions
+        {
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Expires = DateTime.UtcNow.AddHours( 12 )
+        } );
+
+        return Ok( token );
     }
 
+    [Authorize]
     [HttpGet( "all" )]
     public IActionResult GetAllUsers()
     {
