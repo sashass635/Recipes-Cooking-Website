@@ -3,7 +3,9 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 interface NotificationState {
   notification: string;
-  setNotification: (message: string) => void;
+  actions: {
+    setNotification: (message: string) => void;
+  }
 }
 
 interface PopupState {
@@ -16,14 +18,11 @@ interface PopupState {
   setLoginOrRegistrWindowOpen: (isOpen: boolean) => void;
 }
 
-interface StoreState extends NotificationState, PopupState {}
+interface StoreState extends PopupState {}
 
 export const useStore = create<StoreState>()(
   persist(
     (set) => ({
-      notification: "",
-      setNotification: (message: string) => set({ notification: message }),
-
       isRegistrationWindowOpen: false,
       setRegistrationWindowOpen: (isOpen: boolean) => set({ isRegistrationWindowOpen: isOpen }),
 
@@ -37,7 +36,6 @@ export const useStore = create<StoreState>()(
       name: "app-storage",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        notification: state.notification,
         isRegistrationWindowOpen: state.isRegistrationWindowOpen,
         isLoginWindowOpen: state.isLoginWindowOpen,
         isLoginOrRegistrWindowOpen: state.isLoginOrRegistrWindowOpen,
@@ -45,3 +43,15 @@ export const useStore = create<StoreState>()(
     },
   ),
 );
+
+export const useNotificationStore = create<NotificationState>(
+  (set) => ({
+    notification: ``,
+    actions: {
+      setNotification: (message: string) => set({ notification: message }),
+    }
+  })
+);
+
+export const useNotificationsActions = () => useNotificationStore((state) => state.actions);
+

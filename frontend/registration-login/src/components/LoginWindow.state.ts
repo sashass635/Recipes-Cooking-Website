@@ -1,11 +1,11 @@
 import { useState } from "react";
 import axios from "axios";
-import { useStore } from "../hooks/useStore";
+import { useNotificationsActions, useNotificationStore, useStore } from "../hooks/useStore";
 
 export const useLoginWindow = () => {
   const [login, setLogin] = useState("");
   const [password, setPassword] = useState("");
-  const setNotification = useStore((state) => state.setNotification);
+  const {setNotification} = useNotificationsActions();
   const setLoginWindowOpen = useStore((state) => state.setLoginWindowOpen);
   const setRegistrationWindowOpen = useStore((state) => state.setRegistrationWindowOpen);
 
