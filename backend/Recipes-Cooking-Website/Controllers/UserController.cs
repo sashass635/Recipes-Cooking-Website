@@ -1,8 +1,8 @@
-﻿using Domain.Entities;
+﻿using System.IdentityModel.Tokens.Jwt;
+using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.SecurityServices.JWTTokens;
 using Infrastructure.SecurityServices.PasswordHasher;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Recipes_Cooking_Website.Contracts;
 
@@ -41,7 +41,6 @@ public class UserController : ControllerBase
         return Ok( "Registration successful" );
     }
 
-
     [HttpPost( "login" )]
     public IActionResult Login( [FromBody] CreateLoginUserRequest userDto )
     {
@@ -64,7 +63,6 @@ public class UserController : ControllerBase
         return Ok( token );
     }
 
-
     [HttpGet( "all" )]
     public IActionResult GetAllUsers()
     {
@@ -77,6 +75,81 @@ public class UserController : ControllerBase
 
         return Ok( users );
     }
+
+    [HttpPost( "update" )]
+    public IActionResult UpdateProfile( UpdatedUserRequest userRequest )
+    {
+
+        if ( !Request.Headers.ContainsKey( "Authorization" ) )
+        {
+            return Unauthorized( "Authorization header is missing" );
+        }
+
+        var token = Request.Headers[ "Authorization" ].ToString();
+        Console.WriteLine( $"Token received: {token}" );
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken( token );
+        var userIdClaim = jwtToken.Claims.FirstOrDefault( claim => claim.Type == "UserId" )?.Value;
+
+        if ( string.IsNullOrEmpty( userIdClaim ) )
+        {
+            return Unauthorized( "UserId claim is missing in the token" );
+        }
+
+        var userId = int.Parse( userIdClaim );
+        var user = _userRepository.GetUserById( userId );
+
+        if ( user == null )
+        {
+            return NotFound();
+        }
+
+        if ( !_passwordHasher.VerifyPassword( userRequest.OldPassword, user.Password ) )
+        {
+            return BadRequest( "Wrong old password" );
+        }
+
+        var hashedPassword = _passwordHasher.GeneratePassword( userRequest.NewPassword );
+
+        user.Name = userRequest.Name;
+        user.Description = userRequest.Description;
+        user.Login = userRequest.Login;
+        user.Password = hashedPassword;
+
+        _userRepository.Update( user );
+        return Ok( user );
+    }
+
+    [HttpGet( "current" )]
+    public IActionResult GetCurrentUser()
+    {
+
+        if ( !Request.Headers.ContainsKey( "Authorization" ) )
+        {
+            return Unauthorized( "Authorization header is missing" );
+        }
+
+        var token = Request.Headers[ "Authorization" ].ToString();
+        Console.WriteLine( $"Token received: {token}" );
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken( token );
+        var userIdClaim = jwtToken.Claims.FirstOrDefault( claim => claim.Type == "UserId" )?.Value;
+
+        if ( string.IsNullOrEmpty( userIdClaim ) )
+        {
+            return Unauthorized( "UserId claim is missing in the token" );
+        }
+
+        var userId = int.Parse( userIdClaim );
+        var user = _userRepository.GetUserById( userId );
+
+        if ( user == null )
+        {
+            return NotFound();
+        }
+
+        return Ok( user );
+    }
 }
-
-

@@ -1,0 +1,249 @@
+.pageWrapper {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: auto;
+  background-color: #fcf6e9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 24px;
+  z-index: 10;
+}
+
+.login {
+  background-color: #fcfcfc;
+  padding: 20px;
+  width: 80%;
+  max-width: 1000px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.exitButtonContainer {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.exitButton {
+  background: none;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  color: #000;
+  font-weight: bold;
+}
+
+.authHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+
+  h3 {
+    text-align: left;
+    font-size: 34px;
+  }
+}
+
+.buttonHeader {
+  cursor: pointer;
+  background-color: #fdb100;
+  color: #ffffff;
+  justify-content: flex-end;
+  font-size: 14px;
+  line-height: 30px;
+  border: none;
+  border-radius: 5px;
+  margin-bottom: 3px;
+}
+
+.buttonHeader:hover {
+  box-shadow: #605544;
+}
+
+.recipeImg {
+  display: flex;
+  gap: 15px;
+  padding: 20px;
+  border-color: transparent;
+  border-radius: 8px;
+  width: 500px;
+  height: 250px;
+}
+.recipeContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  width: 100%;
+}
+
+.recipeImgPreview {
+  width: 500px;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 15px;
+  margin-top: 10px;
+}
+.textFields {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  background-color: #f9f7f3;
+  align-items: flex-start;
+  width: 100%;
+
+  input,
+  textarea {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+    box-sizing: border-box;
+  }
+}
+.extraInfo {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+
+  .inputGroup {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+
+    input {
+      align-items: left;
+      margin-right: 20px;
+    }
+
+    span {
+      align-items: right;
+      font-size: 14px;
+    }
+  }
+}
+
+.ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background-color: #f9f7f3;
+  border-radius: 8px;
+  width: 500px;
+}
+
+.ingredients h4 {
+  font-size: 18px;
+  color: #333;
+}
+
+.ingredient {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #ffffff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: relative;
+}
+
+.ingredient input[type="text"] {
+  margin-top: 10%;
+  width: 95%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  position: relative;
+  justify-content: flex-end;
+}
+
+.ingredient button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  justify-content: flex-end;
+}
+
+.ingredients button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #ffa726;
+  background-color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background-color: #f9f7f3;
+  border-radius: 8px;
+  width: 500px;
+  height: auto;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background-color: #ffffff;
+  padding: 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  position: relative;
+}
+
+.step h4 {
+  font-size: 18px;
+  color: #333;
+}
+
+.step textarea {
+  width: 95%;
+  padding: 10px;
+  font-size: 14px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  resize: none;
+  height: 80px;
+}
+
+.step button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  justify-content: flex-end;
+}
+
+.steps button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  font-size: 14px;
+  color: #ffa726;
+  background-color: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+}

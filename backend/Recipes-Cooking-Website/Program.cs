@@ -14,13 +14,18 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder( args );
 
 builder.Services.AddCors( options =>
 {
-    options.AddPolicy( "AllowAll",
-        builder =>
-        {
-            builder.AllowAnyOrigin()
-                   .AllowAnyMethod()
-                   .AllowAnyHeader();
-        } );
+    options.AddPolicy( "AllowAll", builder =>
+    {
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    } );
+    options.AddPolicy( "AllowSpecificOrigin", builder =>
+    {
+        builder.WithOrigins( "http://localhost:5173/" )
+               .AllowAnyMethod()
+               .AllowAnyHeader();
+    } );
 } );
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -74,9 +79,13 @@ if ( app.Environment.IsDevelopment() )
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-}
 
-app.UseCors( "AllowAll" );
+    app.UseCors( "AllowAll" );
+}
+else
+{
+    app.UseCors( "AllowSpecificOrigin" );
+}
 
 app.UseAuthentication();
 

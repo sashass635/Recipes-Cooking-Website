@@ -63,5 +63,10 @@ namespace Infrastructure.Foundation.Repositories
             }
             return recipe;
         }
+
+        public IEnumerable<Recipe> GetRecipesByUserId( int userId )
+        {
+            return _dbContext.Set<Recipe>().Where( r => r.AuthorId == userId ).ToList();
+        }
     }
 }

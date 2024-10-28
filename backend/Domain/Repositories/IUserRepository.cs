@@ -7,5 +7,8 @@ namespace Domain.Repositories
         public User? GetUserByLogin( string login );
         public User? GetUserById( int id );
         public IEnumerable<User> GetAllUsers();
+        public User? Update( User user );
+
+
     }
 }

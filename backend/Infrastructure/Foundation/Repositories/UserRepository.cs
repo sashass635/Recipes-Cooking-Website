@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Foundation.Repositories
 {
@@ -25,6 +26,13 @@ namespace Infrastructure.Foundation.Repositories
         public IEnumerable<User> GetAllUsers()
         {
             return _dbContext.Set<User>().ToList();
+        }
+
+        public User? Update( User user )
+        {
+            _dbContext.Set<User>().Update( user );
+            _dbContext.SaveChanges();
+            return user;
         }
     }
 }

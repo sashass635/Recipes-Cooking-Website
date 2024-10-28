@@ -15,13 +15,13 @@ export const useLoginWindow = () => {
     axios
       .post("https://localhost:7161/api/user/login", { login, password })
       .then((response) => {
-        const token = response.data;
+        const token = response.data.token || response.data;
         if (!token) {
           console.error("Token is missing in the response");
           return;
         }
-        Cookies.set("CookiesToken", token);
-        console.log("Token saved:", token);
+        Cookies.set("CookiesToken", response.data);
+        console.log("Token saved:", response.data);
       })
       .catch((error) => {
         console.error("Invalid login or password", error);

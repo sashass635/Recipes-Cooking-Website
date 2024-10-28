@@ -24,6 +24,10 @@ namespace Infrastructure.Foundation.Configurations
                 .IsRequired()
                 .HasMaxLength( 200 );
 
+            builder.Property( t => t.Description )
+                .IsRequired()
+                .HasMaxLength( 200 );
+
             builder.HasMany( u => u.Recipes )
                 .WithOne( r => r.Author )
                 .HasForeignKey( i => i.AuthorId )

@@ -8,5 +8,6 @@ namespace Domain.Repositories
         public IEnumerable<Recipe> GetAllRecipes();
         public Recipe DeleteById( int id );
         public Recipe Update( int id, Recipe recipe );
+        public IEnumerable<Recipe> GetRecipesByUserId( int userId );
     }
 }

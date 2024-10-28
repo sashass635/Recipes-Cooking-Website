@@ -6,8 +6,8 @@ namespace Domain.Entities
     public class Recipe
     {
         public int Id { get; init; }
-        public int AuthorId { get; init; }
-        public User Author { get; init; }
+        public int AuthorId { get; set; }
+        public User Author { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int CookTime { get; set; }

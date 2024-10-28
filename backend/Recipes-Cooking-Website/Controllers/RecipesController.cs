@@ -15,12 +15,14 @@ public class RecipesController : ControllerBase
     private readonly IRecipeRepository _recipeRepository;
     private readonly ITagRepository _tagRepository;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IUserRepository _userRepository;
 
-    public RecipesController( IRecipeRepository recipeRepository, ITagRepository tagRepository, IUnitOfWork unitOfWork )
+    public RecipesController( IRecipeRepository recipeRepository, ITagRepository tagRepository, IUnitOfWork unitOfWork, IUserRepository userRepository )
     {
         _recipeRepository = recipeRepository;
         _tagRepository = tagRepository;
         _unitOfWork = unitOfWork;
+        _userRepository = userRepository;
     }
 
     [HttpPost( "add" )]
@@ -71,6 +73,12 @@ public class RecipesController : ControllerBase
 
             var recipeTag = new RecipeTag( newRecipe.Id, tag.Id );
             newRecipe.RecipeTags.Add( recipeTag );
+        }
+
+        var user = _userRepository.GetUserById( authorId );
+        if ( user != null )
+        {
+            user.Recipes.Add( newRecipe );
         }
 
         _recipeRepository.Add( newRecipe );
@@ -165,5 +173,35 @@ public class RecipesController : ControllerBase
             return NotFound( "Recipe not found" );
         }
         return Ok( recipe );
+    }
+
+    [HttpGet( "usersRecipes" )]
+    public IActionResult GetRecipesByUserId()
+    {
+        if ( !Request.Headers.ContainsKey( "Authorization" ) )
+        {
+            return Unauthorized( "Authorization header is missing" );
+        }
+
+        var token = Request.Headers[ "Authorization" ].ToString();
+        Console.WriteLine( $"Token received: {token}" );
+
+        var handler = new JwtSecurityTokenHandler();
+        var jwtToken = handler.ReadJwtToken( token );
+        var userIdClaim = jwtToken.Claims.FirstOrDefault( claim => claim.Type == "UserId" )?.Value;
+
+        if ( string.IsNullOrEmpty( userIdClaim ) )
+        {
+            return Unauthorized( "UserId claim is missing in the token" );
+        }
+
+        var authorId = int.Parse( userIdClaim );
+        var recipes = _recipeRepository.GetRecipesByUserId( authorId );
+        if ( recipes == null || !recipes.Any() )
+        {
+            return NotFound( "No recipes found for this user" );
+        }
+
+        return Ok( recipes );
     }
 }
