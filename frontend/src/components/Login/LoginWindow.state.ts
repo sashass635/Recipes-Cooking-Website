@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNotificationsActions } from "../../hooks/useNotificationStore";
 import { useLoginActions, useRegistrationActions } from "../../hooks/usePopupStore";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+import { useWebApi } from "../../WebApi";
 
 export const useLoginWindow = () => {
   const [login, setLogin] = useState("");
@@ -10,10 +12,12 @@ export const useLoginWindow = () => {
   const { setNotification } = useNotificationsActions();
   const setLoginWindowOpen = useLoginActions();
   const setRegistrationWindowOpen = useRegistrationActions();
+  const navigate = useNavigate();
+  const api = useWebApi();
 
   const handleLogin = () => {
-    axios
-      .post("https://localhost:7161/api/user/login", { login, password })
+    api
+      .login(login, password)
       .then((response) => {
         const token = response.data.token || response.data;
         if (!token) {
@@ -22,6 +26,7 @@ export const useLoginWindow = () => {
         }
         Cookies.set("CookiesToken", response.data);
         console.log("Token saved:", response.data);
+        navigate("/profile");
       })
       .catch((error) => {
         console.error("Invalid login or password", error);
@@ -38,7 +43,7 @@ export const useLoginWindow = () => {
     setLoginWindowOpen(false);
   };
 
-  const close = () => setLoginWindowOpen(false);
+  const close = () => navigate("/profile");
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

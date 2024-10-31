@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState, useEffect } from "react";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 type UserProfile = {
   name: string;
@@ -26,6 +27,7 @@ export const UserProfile = () => {
     oldPassword: "",
     newPassword: "",
   });
+  const navigate = useNavigate();
 
   useEffect(() => {
     const getProfileData = () => {
@@ -38,19 +40,16 @@ export const UserProfile = () => {
 
       console.log("getProfileData token:", `${token}`);
       axios
-        .get<UserProfile>("https://localhost:7161/api/user/current", {
-          headers: {
-            Authorization: `${token}`,
-          },
-        })
+        .get<UserProfile>("https://localhost:7161/api/user/current", { withCredentials: true })
         .then((response) => {
           setUserProfile(response.data);
           setFormData({ ...formData, ...response.data });
         })
         .catch((error) => {
-          console.error("Failed to load user profile ", error);
+          console.error("Failed to load user profile ", error.message);
         });
     };
+
     getProfileData();
   }, []);
 
@@ -64,11 +63,7 @@ export const UserProfile = () => {
 
     console.log("handleSave token:", `${token}`);
     axios
-      .post("https://localhost:7161/api/user/update", formData, {
-        headers: {
-          Authorization: `${token}`,
-        },
-      })
+      .post("https://localhost:7161/api/user/update", formData, { withCredentials: true })
       .then((response) => {
         setUserProfile(response.data);
         setIsEditing(false);
@@ -95,6 +90,8 @@ export const UserProfile = () => {
     });
   };
 
+  const add = () => navigate("/add-recipe");
+
   return {
     handleInputChange,
     handleCancel,
@@ -103,5 +100,6 @@ export const UserProfile = () => {
     formData,
     userProfile,
     setIsEditing,
+    add,
   };
 };

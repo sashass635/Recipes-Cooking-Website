@@ -164,7 +164,7 @@ public class RecipesController : ControllerBase
         return Ok( recipes );
     }
 
-    [HttpGet( "all/{id}" )]
+    [HttpGet( "{id}" )]
     public IActionResult GetRecipeById( int id )
     {
         var recipe = _recipeRepository.GetById( id );

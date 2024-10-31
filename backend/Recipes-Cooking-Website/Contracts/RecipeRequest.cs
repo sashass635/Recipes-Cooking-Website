@@ -16,7 +16,6 @@ namespace Recipes_Cooking_Website.Contracts
         [Required]
         public int PortionCount { get; set; }
 
-        [Required]
         public string ImageUrl { get; set; }
 
         [Required]

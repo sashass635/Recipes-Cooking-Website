@@ -2,6 +2,8 @@ import axios from "axios";
 import { useState } from "react";
 import { useLoginActions, useRegistrationActions } from "../../hooks/usePopupStore";
 import { useNotificationsActions } from "../../hooks/useNotificationStore";
+import { useNavigate } from "react-router-dom";
+import { useWebApi } from "../../WebApi";
 
 export const useRegistrationWindow = () => {
   const [name, setName] = useState("");
@@ -11,22 +13,25 @@ export const useRegistrationWindow = () => {
   const { setNotification } = useNotificationsActions();
   const setLoginWindowOpen = useLoginActions();
   const setRegistrationWindowOpen = useRegistrationActions();
+  const navigate = useNavigate();
+  const api = useWebApi();
 
   const handleRegister = () => {
     if (password !== confirmPassword) {
       return;
     }
-    axios
-      .post("https://localhost:7161/api/user/register", { name, login, password })
+    api
+      .register(login, password)
       .then(() => {
         setNotification("Registration successful");
+        navigate("/profile");
       })
       .catch((error) => {
         setNotification("Error during registration");
       });
   };
 
-  const close = () => setRegistrationWindowOpen(false);
+  const close = () => navigate("/profile");
 
   const handleCancel = () => {
     setName("");

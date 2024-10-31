@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Repositories;
 using Infrastructure.SecurityServices.JWTTokens;
 using Infrastructure.SecurityServices.PasswordHasher;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Recipes_Cooking_Website.Contracts;
 
@@ -54,10 +55,7 @@ public class UserController : ControllerBase
 
         Response.Cookies.Append( "CookiesToken", token, new CookieOptions
         {
-            HttpOnly = true,
-            Secure = true,
-            SameSite = SameSiteMode.Strict,
-            Expires = DateTime.UtcNow.AddHours( 12 )
+            Expires = DateTime.UtcNow.AddHours( 12 ),
         } );
 
         return Ok( token );
@@ -80,13 +78,13 @@ public class UserController : ControllerBase
     public IActionResult UpdateProfile( UpdatedUserRequest userRequest )
     {
 
-        if ( !Request.Headers.ContainsKey( "Authorization" ) )
+        if ( !Request.Cookies.TryGetValue( "CookiesToken", out var token ) )
         {
-            return Unauthorized( "Authorization header is missing" );
+            Console.WriteLine( "Token is missing in cookies" );
+            return Unauthorized( "Authentication token is missing" );
         }
 
-        var token = Request.Headers[ "Authorization" ].ToString();
-        Console.WriteLine( $"Token received: {token}" );
+        Console.WriteLine( $"Token back: {token}" );
 
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken( token );
@@ -125,13 +123,13 @@ public class UserController : ControllerBase
     public IActionResult GetCurrentUser()
     {
 
-        if ( !Request.Headers.ContainsKey( "Authorization" ) )
+        if ( !Request.Cookies.TryGetValue( "CookiesToken", out var token ) )
         {
-            return Unauthorized( "Authorization header is missing" );
+            Console.WriteLine( "Token is missing in cookies" );
+            return Unauthorized( "Authentication token is missing" );
         }
 
-        var token = Request.Headers[ "Authorization" ].ToString();
-        Console.WriteLine( $"Token received: {token}" );
+        Console.WriteLine( $"Token back: {token}" );
 
         var handler = new JwtSecurityTokenHandler();
         var jwtToken = handler.ReadJwtToken( token );

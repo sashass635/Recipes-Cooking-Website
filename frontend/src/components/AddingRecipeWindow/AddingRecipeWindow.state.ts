@@ -2,20 +2,34 @@ import { useState } from "react";
 import { useRecipeActions } from "../../hooks/usePopupStore";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
+
+type Recipe = {
+  name: string;
+  description: string;
+  cookTime: number;
+  tags: string[];
+  portionCount: number;
+  ingredients: { title: string; description: string }[];
+  steps: { stepDescription: string }[];
+  ImageUrl: string | null;
+};
 
 export const useAddingRecipeCardWindow = () => {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [cookTime, setCookTime] = useState("");
-  const [tags, setTags] = useState<string[]>([]);
-  const [portionCount, setPortionCount] = useState(1);
-  const [ingredients, setIngredients] = useState([{ title: "", description: "" }]);
-  const [steps, setSteps] = useState([{ stepDescription: "" }]);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [imageUrl, setImageFile] = useState<File | null>(null);
-  const setRecipeWindowOpen = useRecipeActions();
+  const [recipe, setRecipe] = useState<Recipe>({
+    name: "",
+    description: "",
+    cookTime: 1,
+    tags: [],
+    portionCount: 1,
+    ingredients: [{ title: "", description: "" }],
+    steps: [{ stepDescription: "" }],
+    ImageUrl: null,
+  });
 
-  const handleAddRecipe = () => {
+  const navigate = useNavigate();
+
+  const handleAddRecipe = async (values: Recipe) => {
     const token = Cookies.get("CookiesToken");
 
     if (!token) {
@@ -23,95 +37,53 @@ export const useAddingRecipeCardWindow = () => {
       return;
     }
 
-    console.log("Authorization:", `${token}`);
-
-    axios
-      .post(
+    // TODO: Все запросы должны вызываться через абстракцию WebApi
+    try {
+      const response = await axios.post(
         "https://localhost:7161/api/recipes/add",
         {
-          name,
-          description,
-          cookTime,
-          portionCount,
-          imageUrl: imagePreview,
-          ingredients,
-          steps,
-          tags: tags.map((tag) => ({ name: tag })),
+          ...values,
+          tags: recipe.tags.map((tag) => ({ name: tag })),
         },
         {
           headers: {
             Authorization: `${token}`,
           },
         },
-      )
-      .then((response) => {
-        console.log(response.data);
-      })
-      .catch(() => {
-        console.error("Error adding recipe");
-      });
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error adding recipe", error);
+    }
   };
 
   const onTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
-    setTags(inputValue.split(",").map((tag) => tag.trim()));
+    setRecipe((current) => ({
+      ...current,
+      tags: inputValue.split(",").map((tag) => tag.trim()),
+    }));
   };
 
-  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) => setName(event.target.value);
-  const onDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => setDescription(event.target.value);
-  const onCookTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => setCookTime(event.target.value);
+  const onNameChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setRecipe((current) => ({ ...current, name: event.target.value }));
+
+  const onDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) =>
+    setRecipe((current) => ({ ...current, description: event.target.value }));
+
+  const onCookTimeChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+    setRecipe((current) => ({ ...current, cookTime: Number(event.target.value) }));
+
   const onPortionCountChange = (event: React.ChangeEvent<HTMLInputElement>) =>
-    setPortionCount(Number(event.target.value));
+    setRecipe((current) => ({ ...current, portionCount: Number(event.target.value) }));
 
   const onIngredientChange = (index: number, value: string, field: "title" | "description") => {
-    const updatedIngredients = [...ingredients];
-    updatedIngredients[index] = { ...updatedIngredients[index], [field]: value };
-    setIngredients(updatedIngredients);
+    setRecipe((current) => {
+      const updatedIngredients = [...current.ingredients];
+      updatedIngredients[index] = { ...updatedIngredients[index], [field]: value };
+      return { ...current, ingredients: updatedIngredients };
+    });
   };
-
-  const onAddIngredient = () => setIngredients([...ingredients, { title: "", description: "" }]);
-
-  const onRemoveIngredient = (index: number) => {
-    const updatedIngredients = ingredients.slice();
-    updatedIngredients.splice(index, 1);
-    setIngredients(updatedIngredients);
-  };
-
-  const onStepChange = (index: number, value: string) => {
-    const updatedSteps = steps.map((step, i) => (i === index ? { ...step, stepDescription: value } : step));
-    setSteps(updatedSteps);
-  };
-
-  const StepsChange = (index: number, event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onStepChange(index, event.target.value);
-  };
-
-  const handleStepsChange = (index: number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    StepsChange(index, event);
-  };
-
-  const onAddStep = () => setSteps([...steps, { stepDescription: "" }]);
-
-  const onRemoveStep = (index: number) => setSteps(steps.filter((_, i) => i !== index));
-
-  const onImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setImagePreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const submit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    handleAddRecipe();
-  };
-
-  const close = () => setRecipeWindowOpen(false);
 
   const ingredientTitle = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
     onIngredientChange(index, event.target.value, "title");
@@ -121,29 +93,81 @@ export const useAddingRecipeCardWindow = () => {
     onIngredientChange(index, event.target.value, "description");
   };
 
+  const onAddIngredient = () =>
+    setRecipe((current) => ({
+      ...current,
+      ingredients: [...current.ingredients, { title: "", description: "" }],
+    }));
+
+  const onRemoveIngredient = (index: number) => {
+    setRecipe((current) => ({
+      ...current,
+      ingredients: current.ingredients.filter((_, i) => i !== index),
+    }));
+  };
+
+  const onStepChange = (index: number, value: string) => {
+    setRecipe((current) => {
+      const updatedSteps = current.steps.map((step, i) => (i === index ? { ...step, stepDescription: value } : step));
+      return { ...current, steps: updatedSteps };
+    });
+  };
+
+  const StepsChange = (index: number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onStepChange(index, event.target.value);
+  };
+
+  const onAddStep = () =>
+    setRecipe((current) => ({
+      ...current,
+      steps: [...current.steps, { stepDescription: "" }],
+    }));
+
+  const onRemoveStep = (index: number) => {
+    setRecipe((current) => ({
+      ...current,
+      steps: current.steps.filter((_, i) => i !== index),
+    }));
+  };
+
+  const onImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setRecipe((current) => ({
+          ...current,
+          ImageUrl: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const submit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    //handleAddRecipe();
+  };
+
+  const close = () => navigate("/profile");
+
   return {
-    tags,
+    recipe,
     onTagChange,
     submit,
     close,
-    name,
-    description,
-    cookTime,
-    portionCount,
     onNameChange,
     onDescriptionChange,
     onCookTimeChange,
     onPortionCountChange,
-    ingredients,
-    steps,
     onAddIngredient,
     onRemoveIngredient,
     onAddStep,
     onRemoveStep,
-    imagePreview,
     onImageUpload,
-    handleStepsChange,
+    StepsChange,
     ingredientTitle,
     ingredientDescription,
+    handleAddRecipe,
   };
 };

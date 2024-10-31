@@ -1,28 +1,25 @@
 import { RegistrationWindow } from "./components/Registration/RegistrationWindow";
 import { LoginWindow } from "./components/Login/LoginWindow";
 import { LoginOrRegistrationWindow } from "./components/LoginOrRegistrationWindow/LoginOrRegistrationWindow";
-import { LoginOrRegistrState, LoginWindowState, RecipeState, RegistrWindowState } from "./hooks/usePopupStore";
 import { UserProfileWindow } from "./components/UserProfile/UserProfile";
 import { AddingRecipeCardWindow } from "./components/AddingRecipeWindow/AddingRecipeWindow";
-import { RecipeListWindow } from "./components/RecipeCard/RecipeList/RecipeList";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { WebApi, WebApiProvider } from "./WebApi";
 
 export const App = () => {
-  const isRegistrationWindowOpen = RegistrWindowState();
-  const isLoginWindowOpen = LoginWindowState();
-  const isLoginOrRegistrWindowOpen = LoginOrRegistrState();
-
   return (
-    <div>
-      {isLoginOrRegistrWindowOpen ? (
-        <LoginOrRegistrationWindow />
-      ) : isLoginWindowOpen ? (
-        <LoginWindow />
-      ) : isRegistrationWindowOpen ? (
-        <RegistrationWindow />
-      ) : (
-        <RecipeListWindow />
-      )}
-    </div>
+    <WebApiProvider value={WebApi.create()}>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/auth" />} />
+          <Route path="/auth" element={<LoginOrRegistrationWindow />} />
+          <Route path="/auth/login" element={<LoginWindow />} />
+          <Route path="/auth/register" element={<RegistrationWindow />} />
+          <Route path="/profile" element={<UserProfileWindow />} />
+          <Route path="/add-recipe" element={<AddingRecipeCardWindow />} />
+        </Routes>
+      </BrowserRouter>
+    </WebApiProvider>
   );
 };
 

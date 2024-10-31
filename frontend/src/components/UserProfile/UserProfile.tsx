@@ -1,11 +1,14 @@
+import { RecipeListWindow } from "../RecipeCard/RecipeList/RecipeList";
 import { UserProfile } from "./UserProfile.state";
 
 export const UserProfileWindow = () => {
-  const { handleInputChange, handleCancel, handleSave, isEditing, formData, userProfile, setIsEditing } = UserProfile();
+  const { handleInputChange, handleCancel, handleSave, isEditing, formData, userProfile, setIsEditing, add } =
+    UserProfile();
 
   return (
     <div>
       <h2>Мой профиль</h2>
+      <button onClick={add}>Опубликовать</button>
       {isEditing ? (
         <div>
           <label>
@@ -33,12 +36,13 @@ export const UserProfileWindow = () => {
         </div>
       ) : (
         <div>
-          <p>Name: {userProfile?.name}</p>
-          <p>Login: {userProfile?.login}</p>
-          <p>Description: {userProfile?.description}</p>
-          <button onClick={() => setIsEditing(true)}>Edit Profile</button>
+          <p>Имя: {userProfile?.name}</p>
+          <p>Логин: {userProfile?.login}</p>
+          <p>Описание: {userProfile?.description}</p>
+          <button onClick={() => setIsEditing(true)}>Редактировать профиль</button>
         </div>
       )}
+      <RecipeListWindow />
     </div>
   );
 };

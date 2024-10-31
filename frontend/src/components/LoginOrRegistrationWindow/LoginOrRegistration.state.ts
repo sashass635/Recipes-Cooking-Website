@@ -1,20 +1,13 @@
+import { useNavigate } from "react-router-dom";
 import { useLoginActions, useLoginOrRegistrActions, useRegistrationActions } from "../../hooks/usePopupStore";
 
 export const useLoginOrRegistrationWindow = () => {
-  const setLoginOrRegistrWindowOpen = useLoginOrRegistrActions();
-  const setLoginWindowOpen = useLoginActions();
-  const setRegistrationWindowOpen = useRegistrationActions();
+  const navigate = useNavigate();
 
-  const openLoginWindow = () => {
-    setLoginOrRegistrWindowOpen(false);
-    setLoginWindowOpen(true);
-  };
+  const openLoginWindow = () => navigate("/auth/login");
 
-  const openRegistrationWindow = () => {
-    setLoginOrRegistrWindowOpen(false);
-    setRegistrationWindowOpen(true);
-  };
-  const close = () => setLoginOrRegistrWindowOpen(false);
+  const openRegistrationWindow = () => navigate("/auth/register");
 
+  const close = () => navigate("/profile");
   return { close, openLoginWindow, openRegistrationWindow };
 };
