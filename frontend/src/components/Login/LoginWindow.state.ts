@@ -38,10 +38,7 @@ export const useLoginWindow = () => {
     setPassword("");
   };
 
-  const setRegistration = () => {
-    setRegistrationWindowOpen(true);
-    setLoginWindowOpen(false);
-  };
+  const setRegistration = () => navigate("/auth/register");
 
   const close = () => navigate("/profile");
 

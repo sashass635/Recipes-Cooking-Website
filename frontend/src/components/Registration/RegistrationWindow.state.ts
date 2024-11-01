@@ -21,10 +21,10 @@ export const useRegistrationWindow = () => {
       return;
     }
     api
-      .register(login, password)
+      .register(name, login, password)
       .then(() => {
         setNotification("Registration successful");
-        navigate("/profile");
+        navigate("/auth/login");
       })
       .catch((error) => {
         setNotification("Error during registration");
@@ -41,10 +41,7 @@ export const useRegistrationWindow = () => {
     setNotification("");
   };
 
-  const setAuthorization = () => {
-    setRegistrationWindowOpen(false);
-    setLoginWindowOpen(true);
-  };
+  const setAuthorization = () => navigate("/auth/login");
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     handleRegister();

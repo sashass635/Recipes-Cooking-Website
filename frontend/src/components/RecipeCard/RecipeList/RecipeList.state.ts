@@ -33,7 +33,7 @@ export const useRecipeList = () => {
         .then((response) => {
           setRecipes(response.data);
         })
-        .catch((err) => {
+        .catch((error) => {
           console.error("Error adding recipe");
         });
     };

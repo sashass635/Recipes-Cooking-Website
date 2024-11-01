@@ -25,8 +25,8 @@ namespace Infrastructure.Foundation.Configurations
                 .HasMaxLength( 200 );
 
             builder.Property( t => t.Description )
-                .IsRequired()
-                .HasMaxLength( 200 );
+                .HasMaxLength( 200 )
+                .HasDefaultValue( string.Empty );
 
             builder.HasMany( u => u.Recipes )
                 .WithOne( r => r.Author )

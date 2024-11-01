@@ -12,6 +12,10 @@ export const AddingRecipeCardWindow = () => {
     onDescriptionChange,
     onCookTimeChange,
     onPortionCountChange,
+    onAddIngredient,
+    onRemoveIngredient,
+    onAddStep,
+    onRemoveStep,
     onImageUpload,
     StepsChange,
     ingredientTitle,
@@ -54,93 +58,84 @@ export const AddingRecipeCardWindow = () => {
         </div>
 
         <Formik initialValues={recipe} validationSchema={recipeSchema} onSubmit={(values) => handleAddRecipe(values)}>
-          {({ values, handleChange, setFieldValue }) => (
+          {({ values, setFieldValue }) => (
             <Form>
               <button className={styles.buttonHeader} type="submit">
                 Опубликовать
               </button>
+
               <div className={styles.recipeContent}>
-                <Field
+                <input
                   type="file"
                   className={styles.recipeImg}
                   accept="image/*"
-                  name="image"
+                  name="ImageUrl"
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    handleChange(e);
                     onImageUpload(e);
+                    setFieldValue("ImageUrl", e.target.value);
                   }}
                 />
-                {recipe.ImageUrl && <img src={recipe.ImageUrl} alt="Preview" className={styles.recipeImgPreview} />}
+                {values.ImageUrl && <img src={values.ImageUrl} alt="Preview" className={styles.recipeImgPreview} />}
+
                 <div className={styles.textFields}>
                   <Field
                     type="text"
                     placeholder="Название рецепта"
                     name="name"
-                    value={values.name}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      handleChange(e);
+                      setFieldValue("name", e.target.value);
                       onNameChange(e);
                     }}
                     required
                   />
                   <Field
                     as="textarea"
-                    placeholder="Краткое описание рецепта (150 символов)"
+                    placeholder="Описание"
                     name="description"
-                    value={values.description}
+                    maxLength={200}
                     onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      handleChange(e);
+                      setFieldValue("description", e.target.value);
                       onDescriptionChange(e);
                     }}
-                    maxLength={200}
                     required
                   />
                   <Field
                     type="text"
-                    placeholder="Добавить теги"
+                    placeholder="Теги"
                     name="tags"
-                    value={Array.isArray(values.tags) ? values.tags.join(", ") : ""}
+                    value={values.tags.join(", ")}
                     onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      const inputValue = e.target.value;
-                      const tagsArray = inputValue.split(",").map((tag) => tag.trim());
-                      setFieldValue("tags", tagsArray);
+                      setFieldValue("tags", e.target.value.split(","));
                       onTagChange(e);
                     }}
                   />
                   <div className={styles.extraInfo}>
-                    <div className={styles.inputGroup}>
-                      <Field
-                        type="number"
-                        name="cookTime"
-                        value={values.cookTime}
-                        placeholder="Время готовки"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          handleChange(e);
-                          onCookTimeChange(e);
-                        }}
-                        required
-                      />
-                      <span>Минут</span>
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <Field
-                        type="number"
-                        name="portionCount"
-                        placeholder="Персон"
-                        value={values.portionCount}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                          handleChange(e);
-                          onPortionCountChange(e);
-                        }}
-                        required
-                      />
-                      <span>Персон</span>
-                    </div>
+                    <Field
+                      type="number"
+                      name="cookTime"
+                      placeholder="Время готовки"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        setFieldValue("cookTime", Number(e.target.value));
+                        onCookTimeChange(e);
+                      }}
+                      required
+                    />
+                    <Field
+                      type="number"
+                      name="portionCount"
+                      placeholder="Персон"
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                        setFieldValue("portionCount", Number(e.target.value));
+                        onPortionCountChange(e);
+                      }}
+                      required
+                    />
                   </div>
                 </div>
               </div>
+
               <FieldArray name="ingredients">
-                {({ push, remove }) => (
+                {() => (
                   <div className={styles.ingredients}>
                     <h4>Ингредиенты</h4>
                     {values.ingredients.map((ingredient, index) => (
@@ -149,9 +144,8 @@ export const AddingRecipeCardWindow = () => {
                           type="text"
                           name={`ingredients.${index}.title`}
                           placeholder="Заголовок для ингредиента"
-                          value={ingredient.title}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            handleChange(e);
+                            setFieldValue(`ingredients.${index}.title`, e.target.value);
                             ingredientTitle(index, e);
                           }}
                           required
@@ -159,48 +153,77 @@ export const AddingRecipeCardWindow = () => {
                         <Field
                           as="textarea"
                           name={`ingredients.${index}.description`}
-                          placeholder="Список продуктов для категории"
-                          value={ingredient.description}
+                          placeholder="Описание ингредиента"
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            handleChange(e);
+                            setFieldValue(`ingredients.${index}.description`, e.target.value);
                             ingredientDescription(index, e);
                           }}
                         />
-                        <button type="button" onClick={() => remove(index)}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onRemoveIngredient(index);
+                            setFieldValue(
+                              "ingredients",
+                              values.ingredients.filter((_, i) => i !== index),
+                            );
+                          }}
+                        >
                           &times;
                         </button>
                       </div>
                     ))}
-                    <button type="button" onClick={() => push({ title: "", description: "" })}>
-                      Добавить заголовок
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onAddIngredient();
+                        setFieldValue("ingredients", [...values.ingredients, { title: "", description: "" }]);
+                      }}
+                    >
+                      Добавить ингредиент
                     </button>
                   </div>
                 )}
               </FieldArray>
+
               <FieldArray name="steps">
-                {({ push, remove }) => (
+                {() => (
                   <div className={styles.steps}>
-                    {values.steps.map((step, index) => (
+                    {recipe.steps.map((step, index) => (
                       <div className={styles.step} key={index}>
                         <h4>Шаг {index + 1}</h4>
                         <Field
                           as="textarea"
                           name={`steps.${index}.stepDescription`}
                           placeholder="Описание шага"
-                          value={step.stepDescription}
                           onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                            handleChange(e);
+                            setFieldValue(`steps.${index}.stepDescription`, e.target.value);
                             StepsChange(index)(e);
                           }}
                           required
                         />
-
-                        <button type="button" onClick={() => remove(index)}>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            onRemoveStep(index);
+                            setFieldValue(
+                              "steps",
+                              values.steps.filter((_, i) => i !== index),
+                            );
+                          }}
+                        >
                           &times;
                         </button>
                       </div>
                     ))}
-                    <button type="button" onClick={() => push({ stepDescription: "" })}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onAddStep();
+                        setFieldValue("steps", [...values.steps, { stepDescription: "" }]);
+                      }}
+                    >
+                      {" "}
                       Добавить шаг
                     </button>
                   </div>
