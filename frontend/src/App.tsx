@@ -5,6 +5,7 @@ import { UserProfileWindow } from "./components/UserProfile/UserProfile";
 import { AddingRecipeCardWindow } from "./components/AddingRecipeWindow/AddingRecipeWindow";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { WebApi, WebApiProvider } from "./WebApi";
+import { RecipeDetail } from "./components/RecipeCard/RecipeDetail/RecipeDetailWindow";
 
 export const App = () => {
   return (
@@ -17,6 +18,7 @@ export const App = () => {
           <Route path="/auth/register" element={<RegistrationWindow />} />
           <Route path="/profile" element={<UserProfileWindow />} />
           <Route path="/add-recipe" element={<AddingRecipeCardWindow />} />
+          <Route path="/recipes/:id" element={<RecipeDetail />} />
         </Routes>
       </BrowserRouter>
     </WebApiProvider>

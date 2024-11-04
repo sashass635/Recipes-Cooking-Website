@@ -8,6 +8,7 @@ export const AddingRecipeCardWindow = () => {
     recipe,
     onTagChange,
     close,
+    submit,
     onNameChange,
     onDescriptionChange,
     onCookTimeChange,
@@ -56,182 +57,90 @@ export const AddingRecipeCardWindow = () => {
         <div className={styles.authHeader}>
           <h3>Добавить новый рецепт</h3>
         </div>
-
-        <Formik initialValues={recipe} validationSchema={recipeSchema} onSubmit={(values) => handleAddRecipe(values)}>
-          {({ values, setFieldValue }) => (
-            <Form>
-              <button className={styles.buttonHeader} type="submit">
-                Опубликовать
-              </button>
-
-              <div className={styles.recipeContent}>
-                <input
-                  type="file"
-                  className={styles.recipeImg}
-                  accept="image/*"
-                  name="ImageUrl"
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                    onImageUpload(e);
-                    setFieldValue("ImageUrl", e.target.value);
-                  }}
-                />
-                {values.ImageUrl && <img src={values.ImageUrl} alt="Preview" className={styles.recipeImgPreview} />}
-
-                <div className={styles.textFields}>
-                  <Field
-                    type="text"
-                    placeholder="Название рецепта"
-                    name="name"
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      setFieldValue("name", e.target.value);
-                      onNameChange(e);
-                    }}
+        <form onSubmit={submit}>
+          <button className={styles.buttonHeader} type="submit">
+            Опубликовать
+          </button>
+          <div className={styles.recipeContent}>
+            <div className={styles.uploadContainer}>
+              <input type="file" className={styles.recipeImg} accept="image/*" onChange={onImageUpload} />
+              {recipe.ImageUrl && <img src={recipe.ImageUrl} alt="Preview" className={styles.recipeImgPreview} />}
+            </div>
+            <div className={styles.textFields}>
+              <input type="text" placeholder="Название рецепта" value={recipe.name} onChange={onNameChange} required />
+              <textarea
+                placeholder="Краткое описание рецепта (150 символов)"
+                value={recipe.description}
+                onChange={onDescriptionChange}
+                maxLength={150}
+                required
+              />
+              <input type="text" placeholder="Добавить теги" value={recipe.tags.join(", ")} onChange={onTagChange} />
+              <div className={styles.extraInfo}>
+                <div className={styles.inputGroup}>
+                  <input
+                    type="number"
+                    placeholder="Время готовки"
+                    value={recipe.cookTime}
+                    onChange={onCookTimeChange}
                     required
                   />
-                  <Field
-                    as="textarea"
-                    placeholder="Описание"
-                    name="description"
-                    maxLength={200}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                      setFieldValue("description", e.target.value);
-                      onDescriptionChange(e);
-                    }}
-                    required
-                  />
-                  <Field
-                    type="text"
-                    placeholder="Теги"
-                    name="tags"
-                    value={values.tags.join(", ")}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                      setFieldValue("tags", e.target.value.split(","));
-                      onTagChange(e);
-                    }}
-                  />
-                  <div className={styles.extraInfo}>
-                    <Field
-                      type="number"
-                      name="cookTime"
-                      placeholder="Время готовки"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setFieldValue("cookTime", Number(e.target.value));
-                        onCookTimeChange(e);
-                      }}
-                      required
-                    />
-                    <Field
-                      type="number"
-                      name="portionCount"
-                      placeholder="Персон"
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                        setFieldValue("portionCount", Number(e.target.value));
-                        onPortionCountChange(e);
-                      }}
-                      required
-                    />
-                  </div>
+                  <span>Минут</span>
+                </div>
+                <div className={styles.inputGroup}>
+                  <input type="number" value={recipe.portionCount} onChange={onPortionCountChange} required />
+                  <span>Персон</span>
                 </div>
               </div>
-
-              <FieldArray name="ingredients">
-                {() => (
-                  <div className={styles.ingredients}>
-                    <h4>Ингредиенты</h4>
-                    {values.ingredients.map((ingredient, index) => (
-                      <div className={styles.ingredient} key={index}>
-                        <Field
-                          type="text"
-                          name={`ingredients.${index}.title`}
-                          placeholder="Заголовок для ингредиента"
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            setFieldValue(`ingredients.${index}.title`, e.target.value);
-                            ingredientTitle(index, e);
-                          }}
-                          required
-                        />
-                        <Field
-                          as="textarea"
-                          name={`ingredients.${index}.description`}
-                          placeholder="Описание ингредиента"
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            setFieldValue(`ingredients.${index}.description`, e.target.value);
-                            ingredientDescription(index, e);
-                          }}
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onRemoveIngredient(index);
-                            setFieldValue(
-                              "ingredients",
-                              values.ingredients.filter((_, i) => i !== index),
-                            );
-                          }}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onAddIngredient();
-                        setFieldValue("ingredients", [...values.ingredients, { title: "", description: "" }]);
-                      }}
-                    >
-                      Добавить ингредиент
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-
-              <FieldArray name="steps">
-                {() => (
-                  <div className={styles.steps}>
-                    {recipe.steps.map((step, index) => (
-                      <div className={styles.step} key={index}>
-                        <h4>Шаг {index + 1}</h4>
-                        <Field
-                          as="textarea"
-                          name={`steps.${index}.stepDescription`}
-                          placeholder="Описание шага"
-                          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-                            setFieldValue(`steps.${index}.stepDescription`, e.target.value);
-                            StepsChange(index)(e);
-                          }}
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => {
-                            onRemoveStep(index);
-                            setFieldValue(
-                              "steps",
-                              values.steps.filter((_, i) => i !== index),
-                            );
-                          }}
-                        >
-                          &times;
-                        </button>
-                      </div>
-                    ))}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        onAddStep();
-                        setFieldValue("steps", [...values.steps, { stepDescription: "" }]);
-                      }}
-                    >
-                      {" "}
-                      Добавить шаг
-                    </button>
-                  </div>
-                )}
-              </FieldArray>
-            </Form>
-          )}
-        </Formik>
+            </div>
+          </div>
+          <div className={styles.recipeContent}>
+            <div className={styles.ingredients}>
+              <h4>Ингредиенты</h4>
+              {recipe.ingredients.map((ingredient, index) => (
+                <div className={styles.ingredient} key={index}>
+                  <input
+                    type="text"
+                    placeholder="Заголовок для ингредиента"
+                    value={ingredient.title}
+                    onChange={ingredientTitle(index)}
+                    required
+                  />
+                  <textarea
+                    placeholder="Список продуктов для категории"
+                    value={ingredient.description}
+                    onChange={ingredientDescription(index)}
+                  />
+                  <button type="button" onClick={() => onRemoveIngredient(index)}>
+                    &times;
+                  </button>
+                </div>
+              ))}
+              <button type="button" onClick={onAddIngredient}>
+                Добавить заголовок
+              </button>
+            </div>
+            <div className={styles.steps}>
+              {recipe.steps.map((step, index) => (
+                <div className={styles.step} key={index}>
+                  <h4>Шаг {index + 1}</h4>
+                  <textarea
+                    placeholder="Описание шага"
+                    value={step.stepDescription}
+                    onChange={StepsChange(index)}
+                    required
+                  />
+                  <button type="button" onClick={() => onRemoveStep(index)}>
+                    &times;
+                  </button>
+                </div>
+              ))}
+              <button type="button" onClick={onAddStep}>
+                Добавить шаг
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   );

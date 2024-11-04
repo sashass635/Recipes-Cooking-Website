@@ -27,5 +27,5 @@ public class RecipeUpdateRequest
     public List<StepRequest> Steps { get; set; }
 
     [Required]
-    public List<TagRequest> Tags { get; init; }
+    public List<TagRequest> Tags { get; set; }
 }

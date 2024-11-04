@@ -30,8 +30,7 @@ namespace Infrastructure.Foundation.Configurations
                 .IsRequired()
                 .HasMaxLength( 50 );
 
-            builder.Property( r => r.ImageUrl )
-                .IsRequired();
+            builder.Property( r => r.ImageUrl );
 
             builder.HasMany( r => r.Ingredients )
                 .WithOne( i => i.Recipe )

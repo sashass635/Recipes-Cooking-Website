@@ -19,6 +19,7 @@ namespace Infrastructure.Foundation.Repositories
                 .Include( r => r.Ingredients )
                 .Include( r => r.Steps )
                 .Include( r => r.RecipeTags )
+                .ThenInclude( rt => rt.Tag )
                 .FirstOrDefault( r => r.Id == id );
         }
 
@@ -45,7 +46,6 @@ namespace Infrastructure.Foundation.Repositories
 
             return recipe;
         }
-
 
         public Recipe Update( int id, Recipe updatedRecipe )
         {

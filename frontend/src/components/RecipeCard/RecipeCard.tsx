@@ -20,19 +20,6 @@ export const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
     <div className={styles.recipe}>
       <img className={styles.recipeImg} src={recipe.imageUrl} alt="Recipe" />
       <span className={styles.recipeInfo}>
-        <div className={styles.recipeHeader}>
-          <span className={styles.recipeTags}>
-            {recipe.tags && recipe.tags.length > 0 ? (
-              recipe.tags.map((tag) => (
-                <span key={tag.name} className={styles.recipeTag}>
-                  {tag.name}
-                </span>
-              ))
-            ) : (
-              <span className={styles.recipeTag}>No tags</span>
-            )}
-          </span>
-        </div>
         <span className={styles.recipeNameInfo}>
           <h3 className={styles.recipeName}>{recipe.name}</h3>
           <p className={styles.recipeDescription}>{recipe.description}</p>

@@ -1,8 +1,15 @@
+import { useNavigate } from "react-router-dom";
 import { RecipeCard } from "../RecipeCard";
 import { useRecipeList } from "./RecipeList.state";
 
 export const RecipeListWindow = () => {
   const { recipes } = useRecipeList();
+
+  const navigate = useNavigate();
+
+  const handleRecipeClick = (id: number) => {
+    navigate(`/recipes/${id}`);
+  };
 
   return (
     <div className="recipeList">
@@ -12,7 +19,7 @@ export const RecipeListWindow = () => {
       ) : (
         <ul className="recipeListItems">
           {recipes.map((recipe) => (
-            <li key={recipe.id} className="recipeListItem">
+            <li key={recipe.id} className="recipeListItem" onClick={() => handleRecipeClick(recipe.id)}>
               <RecipeCard recipe={recipe} />
             </li>
           ))}

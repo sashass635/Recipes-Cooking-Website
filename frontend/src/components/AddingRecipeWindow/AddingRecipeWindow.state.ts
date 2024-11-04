@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useRecipeActions } from "../../hooks/usePopupStore";
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
@@ -29,7 +28,7 @@ export const useAddingRecipeCardWindow = () => {
 
   const navigate = useNavigate();
 
-  const handleAddRecipe = async (values: Recipe) => {
+  const handleAddRecipe = async () => {
     const token = Cookies.get("CookiesToken");
 
     if (!token) {
@@ -42,7 +41,7 @@ export const useAddingRecipeCardWindow = () => {
       const response = await axios.post(
         "https://localhost:7161/api/recipes/add",
         {
-          ...values,
+          ...recipe,
           tags: recipe.tags.map((tag) => ({ name: tag })),
         },
         {
@@ -85,11 +84,11 @@ export const useAddingRecipeCardWindow = () => {
     });
   };
 
-  const ingredientTitle = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const ingredientTitle = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
     onIngredientChange(index, event.target.value, "title");
   };
 
-  const ingredientDescription = (index: number, event: React.ChangeEvent<HTMLInputElement>) => {
+  const ingredientDescription = (index: number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
     onIngredientChange(index, event.target.value, "description");
   };
 
@@ -146,7 +145,7 @@ export const useAddingRecipeCardWindow = () => {
 
   const submit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    //handleAddRecipe();
+    handleAddRecipe();
   };
 
   const close = () => navigate("/profile");

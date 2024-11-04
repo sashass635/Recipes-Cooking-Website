@@ -36,7 +36,7 @@ export const useRecipeDetail = (id: number) => {
     imageUrl: "",
     ingredients: [{ title: "", description: "" }],
     steps: [{ stepDescription: "" }],
-    tags: [{ name: "" }],
+    tags: [],
   });
   const navigate = useNavigate();
 
@@ -49,13 +49,15 @@ export const useRecipeDetail = (id: number) => {
       }
       axios
         .get(`https://localhost:7161/api/recipes/${id}`, {
-          headers: {
-            Authorization: token,
-          },
+          headers: { Authorization: token },
         })
         .then((response) => {
-          setRecipe(response.data);
-          setFormData({ ...formData, ...response.data });
+          const recipeData = {
+            ...response.data,
+          };
+          setRecipe(recipeData);
+          setFormData({ ...formData, ...recipeData });
+          navigate(`/recipes/${id}`);
         });
     };
     handleRecipe();
@@ -66,10 +68,7 @@ export const useRecipeDetail = (id: number) => {
 
     axios
       .put(`https://localhost:7161/api/recipes/update/${id}`, formData, {
-        headers: {
-          Authorization: `${token}`,
-        },
-        withCredentials: true,
+        headers: { Authorization: `${token}` },
       })
       .then((response) => {
         setRecipe(response.data);
@@ -81,10 +80,117 @@ export const useRecipeDetail = (id: number) => {
 
   const handleCancel = () => {
     if (recipe) {
-      setFormData({ ...formData, ...recipe });
+      setFormData({
+        ...formData,
+        ...recipe,
+      });
     }
     setIsEditing(false);
   };
 
-  return { recipe, handleEditRecipe, handleCancel };
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = event.target;
+
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const onImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFormData((current) => ({
+          ...current,
+          imageUrl: reader.result as string,
+        }));
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const onIngredientChange = (index: number, value: string, field: "title" | "description") => {
+    setFormData((current) => {
+      const updatedIngredients = [...current.ingredients];
+      updatedIngredients[index] = { ...updatedIngredients[index], [field]: value };
+      return { ...current, ingredients: updatedIngredients };
+    });
+  };
+
+  const ingredientTitle = (index: number) => (event: React.ChangeEvent<HTMLInputElement>) => {
+    onIngredientChange(index, event.target.value, "title");
+  };
+
+  const ingredientDescription = (index: number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onIngredientChange(index, event.target.value, "description");
+  };
+
+  const onRemoveIngredient = (index: number) => {
+    setFormData((current) => ({
+      ...current,
+      ingredients: current.ingredients.filter((_, i) => i !== index),
+    }));
+  };
+
+  const onAddIngredient = () =>
+    setFormData((current) => ({
+      ...current,
+      ingredients: [...current.ingredients, { title: "", description: "" }],
+    }));
+
+  const onStepChange = (index: number, value: string) => {
+    setFormData((current) => {
+      const updatedSteps = current.steps.map((step, i) => (i === index ? { ...step, stepDescription: value } : step));
+      return { ...current, steps: updatedSteps };
+    });
+  };
+
+  const StepsChange = (index: number) => (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    onStepChange(index, event.target.value);
+  };
+
+  const onAddStep = () =>
+    setFormData((current) => ({
+      ...current,
+      steps: [...current.steps, { stepDescription: "" }],
+    }));
+
+  const onRemoveStep = (index: number) => {
+    setFormData((current) => ({
+      ...current,
+      steps: current.steps.filter((_, i) => i !== index),
+    }));
+  };
+
+  const onTagChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setFormData({
+      ...formData,
+      tags: value.split(",").map((tag) => ({ name: tag.trim() })),
+    });
+  };
+
+  const close = () => navigate("/profile");
+
+  return {
+    close,
+    formData,
+    recipe,
+    handleEditRecipe,
+    handleCancel,
+    isEditing,
+    setIsEditing,
+    handleInputChange,
+    onImageUpload,
+    ingredientTitle,
+    ingredientDescription,
+    onRemoveIngredient,
+    StepsChange,
+    onAddStep,
+    onRemoveStep,
+    onTagChange,
+    onAddIngredient,
+  };
 };

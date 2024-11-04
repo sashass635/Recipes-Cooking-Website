@@ -172,7 +172,30 @@ public class RecipesController : ControllerBase
         {
             return NotFound( "Recipe not found" );
         }
-        return Ok( recipe );
+
+        var recipeDto = new RecipeRequest
+        {
+            Name = recipe.Name,
+            Description = recipe.Description,
+            CookTime = recipe.CookTime,
+            PortionCount = recipe.PortionCount,
+            ImageUrl = recipe.ImageUrl,
+            Ingredients = recipe.Ingredients.Select( i => new IngredientRequest
+            {
+                Title = i.Title,
+                Description = i.Description
+            } ).ToList(),
+            Steps = recipe.Steps.Select( s => new StepRequest
+            {
+                StepDescription = s.StepDescription
+            } ).ToList(),
+            Tags = recipe.RecipeTags.Select( rt => new TagRequest
+            {
+                Name = rt.Tag.Name
+            } ).ToList()
+        };
+
+        return Ok( recipeDto );
     }
 
     [HttpGet( "usersRecipes" )]
